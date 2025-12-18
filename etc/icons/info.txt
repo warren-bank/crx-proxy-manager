@@ -1,0 +1,9 @@
+https://feathericons.com/
+https://feathericons.com/?query=aperture
+  made by:      https://twitter.com/colebemis
+  size:         128px
+  stroke width: 1.5px
+  color:        #999
+
+https://cloudconvert.com/svg-to-png
+  svg => png: 128px, 48px, 32px, 16px

@@ -1,0 +1,23 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.button {
+  background-color: #008CBA; /* Blue */
+  display: inline-block;
+  width: 125px;
+  font-size: 14px;
+  border-radius: 4px;
+  border: none;
+  color: white;
+  font-weight: bold;
+  padding: 8px;
+  text-align: center;
+  text-decoration: none;
+  transition-duration: 0.4s;
+}
+
+.button:hover {
+  background-color: #0070A0;
+}

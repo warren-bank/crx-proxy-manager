@@ -1,0 +1,48 @@
+--------------------------------------------------------------------------------
+
+https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Chrome_incompatibilities#proxy_api
+
+--------------------------------------------------------------------------------
+
+https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/proxy
+https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/proxy/onRequest
+https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/proxy/ProxyInfo
+
+example:
+========
+https://github.com/mdn/webextensions-examples/tree/main/proxy-blocker
+
+--------------------------------------------------------------------------------
+
+https://developer.chrome.com/docs/extensions/reference/api/proxy
+
+pac_script:
+===========
+
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Proxy_servers_and_tunneling/Proxy_Auto-Configuration_PAC_file
+
+API:
+====
+  FindProxyForURL = (url, host) => configuration
+where:
+  url  = URL being accessed
+  host = hostname extracted from the URL (for convenience)
+  configuration = null || string containing building blocks, each separated by a semicolon
+
+notes:
+======
+  * FindProxyForURL(url) doesn't provide any context
+    - tabId   => where request was made
+    - referer => url of window.document where request was made
+
+--------------------------------------------------------------------------------
+
+conclusions:
+============
+  * the Firefox API will allow a background script to easily identify the tabId where each request was made
+    - this is required to support enabling the proxy on individual tabs
+
+  * the Chrome API does not provide this granular visibility
+    - Chrome will not be supported!
+
+--------------------------------------------------------------------------------

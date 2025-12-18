@@ -1,0 +1,8 @@
+#show_info,
+#show_info > pre {
+  font-family: monospace;
+  font-size: 10px;
+  margin: 0;
+  height: 15em;
+  overflow: auto;
+}

@@ -4,9 +4,11 @@
 // hard-coded config values
 
 const hc_config = {
-  proxyDNS: false,
-  failoverTimeout: 10,
-  default_template: 'roundproxies'
+  default_template: 'roundproxies',
+  default_proxy: {
+    proxyDNS: false,
+    failoverTimeout: 10
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -308,34 +310,65 @@ async function refreshProxies() {
 }
 
 function normalizeProxies() {
+  const types = ['http','https','socks','socks4']
+
   if (Array.isArray(proxies)) {
-    const types = ['http','https','socks','socks4']
-    proxies = proxies.filter(proxy => proxy && (proxy instanceof Object) && proxy.type && proxy.host && proxy.port && types.includes(proxy.type) && (typeof proxy.host === 'string') && (typeof proxy.port === 'number') && (proxy.port > 0))
+    proxies = proxies.filter(proxy => isProxyObject(proxy, types))
 
     if (!proxies.length)
       proxies = null
   }
   if (Array.isArray(proxies)) {
-    for (let proxy of proxies) {
-      normalizeProxy(proxy)
-    }
+    proxies = proxies.map(normalizeProxyObject)
+  }
+  else if (isProxyObject(proxies, types)) {
+    proxies = [ normalizeProxyObject(proxies) ]
   }
   else {
-    normalizeProxy(proxies)
+    proxies = null
   }
 }
 
-function normalizeProxy(proxy) {
-  if (proxy && (proxy instanceof Object)) {
-    if (proxy.type && proxy.type.startsWith('socks')) {
-      proxy.proxyDNS = hc_config.proxyDNS
-    }
-    proxy.failoverTimeout = hc_config.failoverTimeout
+function isProxyObject(proxy, types = ['http','https','socks','socks4']) {
+  return !!proxy && (proxy instanceof Object) && proxy.type && proxy.host && proxy.port && types.includes(proxy.type) && (typeof proxy.host === 'string') && (typeof proxy.port === 'number') && (proxy.port > 0)
+}
+
+function normalizeProxyObject(old_proxy) {
+  const is_socks_5   = (old_proxy.type === 'socks')
+  const is_socks_any = old_proxy.type.startsWith('socks')
+  const is_http_any  = old_proxy.type.startsWith('http')
+  const wl_keys = ['type', 'host', 'port', 'failoverTimeout', 'connectionIsolationKey']
+  if (is_socks_5) {
+    wl_keys.push('username', 'password')
   }
+  if (is_socks_any) {
+    wl_keys.push('proxyDNS')
+  }
+  if (is_http_any) {
+    wl_keys.push('proxyAuthorizationHeader')
+  }
+  let new_proxy = {}
+
+  // copy keys in whitelist
+  for (let key in old_proxy) {
+    if (wl_keys.includes(key)) {
+      new_proxy[key] = old_proxy[key]
+    }
+  }
+
+  // apply defaults
+  for (let key in hc_config.default_proxy) {
+    if (wl_keys.includes(key) && (typeof new_proxy[key] === 'undefined')) {
+      new_proxy[key] = hc_config.default_proxy[key]
+    }
+  }
+
+  return new_proxy
 }
 
 function prevProxy() {
   if (proxy_index < 0) return
+  if ((proxy_index === 0) && (proxies.length === 1)) return
 
   proxy_index = (proxy_index - 1)
   if (proxy_index < 0)
@@ -344,6 +377,7 @@ function prevProxy() {
 
 function nextProxy() {
   if (proxy_index < 0) return
+  if ((proxy_index === 0) && (proxies.length === 1)) return
 
   proxy_index = (proxy_index + 1)
   if (proxy_index >= proxies.length)
@@ -357,13 +391,17 @@ function proxyRequestListener(details) {
 }
 
 function getCurrentProxies() {
-  return (proxy_index >= 0)
-    ? [...proxies.slice(proxy_index), ...proxies.slice(0, proxy_index), null]
-    : [proxies, null]
+  if (proxy_index === 0)
+    return [...proxies, null]
+
+  if (proxy_index > 0)
+    return [...proxies.slice(proxy_index), ...proxies.slice(0, proxy_index), null]
+
+  return null
 }
 
 function getCurrentProxy() {
   return (proxy_index >= 0)
     ? proxies[proxy_index]
-    : proxies
+    : null
 }

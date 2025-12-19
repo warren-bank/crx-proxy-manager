@@ -83,6 +83,10 @@ function onclick_start_stop() {
       started = "on"
       start_stop.value = "Stop"
 
+      if (tab_started === "on") {
+        tab_started = "off"
+        start_stop_tab.value = "Start Tab"
+      }
       start_stop_tab.disabled = true
 
       // if exists reload config tab , to get the start/stop information correct

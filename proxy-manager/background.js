@@ -4,17 +4,14 @@
 // hard-coded config values
 
 const hc_config = {
-  default_template: 'roundproxies',
-  default_proxy: {
-    proxyDNS: false,
-    failoverTimeout: 10
-  }
+  default_template: 'roundproxies'
 }
 
 // -----------------------------------------------------------------------------
 // state management
 
 let config
+let default_proxy
 let started = 'off'
 let active_tabs = {}
 let active_tabs_count = 0
@@ -61,11 +58,23 @@ loadFromBrowserStorage(['config', 'started'], function (result) {
 function loadDefaultConfiguration() {
   console.log('Load default config')
 
-  config = { get_proxies_function_body: window.templates[hc_config.default_template] }
+  config = {
+    get_proxies_function_body: window.templates[hc_config.default_template],
+    allow_fallback: true,
+    allow_fallback_prev: true,
+    fallback_timeout: 10,
+    proxy_dns: false
+  }
+
   storeInBrowserStorage({ config: JSON.stringify(config) })
 }
 
 async function preProcessConfig() {
+  default_proxy = {
+    proxyDNS:        config.proxy_dns,
+    failoverTimeout: config.fallback_timeout
+  }
+
   try {
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/AsyncFunction
     // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/content_security_policy
@@ -337,7 +346,10 @@ function normalizeProxyObject(old_proxy) {
   const is_socks_5   = (old_proxy.type === 'socks')
   const is_socks_any = old_proxy.type.startsWith('socks')
   const is_http_any  = old_proxy.type.startsWith('http')
-  const wl_keys = ['type', 'host', 'port', 'failoverTimeout', 'connectionIsolationKey']
+  const wl_keys = ['type', 'host', 'port', 'connectionIsolationKey']
+  if (config.allow_fallback) {
+    wl_keys.push('failoverTimeout')
+  }
   if (is_socks_5) {
     wl_keys.push('username', 'password')
   }
@@ -357,9 +369,9 @@ function normalizeProxyObject(old_proxy) {
   }
 
   // apply defaults
-  for (let key in hc_config.default_proxy) {
+  for (let key in default_proxy) {
     if (wl_keys.includes(key) && (typeof new_proxy[key] === 'undefined')) {
-      new_proxy[key] = hc_config.default_proxy[key]
+      new_proxy[key] = default_proxy[key]
     }
   }
 
@@ -391,11 +403,16 @@ function proxyRequestListener(details) {
 }
 
 function getCurrentProxies() {
+  if (!config.allow_fallback && (proxy_index >= 0))
+    return [proxies[proxy_index], null]
+
   if (proxy_index === 0)
     return [...proxies, null]
 
   if (proxy_index > 0)
-    return [...proxies.slice(proxy_index), ...proxies.slice(0, proxy_index), null]
+    return config.allow_fallback_prev
+      ? [...proxies.slice(proxy_index), ...proxies.slice(0, proxy_index), null]
+      : [...proxies.slice(proxy_index), null]
 
   return null
 }

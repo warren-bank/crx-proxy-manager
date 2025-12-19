@@ -20,9 +20,23 @@
           <option value="pubproxy">pubproxy</option>
           <option value="localhost">localhost</option>
         </select>
-        <br />
-        <br />
-        <input type="button" class="button" id="save_button" value="Save"></input>
+        <div class="section left small">
+          <div>
+            <input type="checkbox" id="checkbox_allow_fallback" checked />Allow fallback to next proxies in list?
+          </div>
+          <div class="subsection requires_checkbox_allow_fallback">
+            <input type="checkbox" id="checkbox_allow_fallback_prev" checked />Allow fallback to also include previous proxies in list?
+          </div>
+          <div class="subsection requires_checkbox_allow_fallback">
+            Fallback timeout (seconds): <input type="text" id="text_fallback_timeout" maxlength="5" value="10" />
+          </div>
+          <div class="subsection">
+            <input type="checkbox" id="checkbox_proxy_dns" />Proxy DNS over SOCKS v5?
+          </div>
+        </div>
+        <div class="section">
+          <input type="button" class="button" id="save_button" value="Save"></input>
+        </div>
       </td>
     </tr>
   </table>

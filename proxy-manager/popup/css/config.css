@@ -3,3 +3,19 @@ textarea {
   width: 100%;
   height: calc(100vh - 20px);
 }
+
+div.section {
+  margin-top: 1.5em;
+}
+
+div.subsection {
+  margin-top: 1em;
+}
+
+.left {
+  text-align: left;
+}
+
+.small {
+  font-size: 0.75em;
+}

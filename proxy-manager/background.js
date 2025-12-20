@@ -4,7 +4,7 @@
 // hard-coded config values
 
 const hc_config = {
-  default_template: 'roundproxies'
+  default_template: 'proxifly'
 }
 
 // -----------------------------------------------------------------------------

@@ -1,4 +1,45 @@
 window.templates = {
+  "proxifly": `
+// https://github.com/proxifly/free-proxy-list
+
+const url = 'https://github.com/proxifly/free-proxy-list/raw/main/proxies/all/data.json'
+
+let response
+response = await fetch(url)
+response = await response.json()
+
+let proxies
+if (response && Array.isArray(response) && response.length) {
+  proxies = response
+  proxies = proxies.map(proxy => {
+    if (!proxy || !(proxy instanceof Object) || !proxy.protocol || !proxy.ip || !proxy.port)
+      return null
+
+    let type = proxy.protocol.toLowerCase()
+    let host = proxy.ip
+    let port = proxy.port
+
+    if (type === 'socks5')
+      type = 'socks'
+
+    if ((type === 'http') && proxy.https)
+      type = 'https'
+
+    if (!['http','https','socks','socks4'].includes(type))
+      return null
+    if (isNaN(port) || (port <= 0))
+      return null
+
+    return {type, host, port}
+  })
+  proxies = proxies.filter(proxy => !!proxy)
+}
+if (!proxies || !Array.isArray(proxies) || !proxies.length) {
+  proxies = null
+}
+return proxies
+`,
+
   "roundproxies": `
 // https://roundproxies.com/free-proxy-list/
 

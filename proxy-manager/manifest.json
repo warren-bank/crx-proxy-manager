@@ -1,7 +1,7 @@
 {
   "name": "Proxy Manager",
   "description": "Configure the methodology to dynamically obtain a fresh list of proxy servers. Enable the use of a proxy for all tabs, or for individual tabs. At any time, refresh the proxy list or switch the proxy in use.",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "manifest_version": 2,
   "icons": {
     "16":  "icons/aperture-999-16.png",
@@ -35,11 +35,14 @@
     "<all_urls>"
   ],
   "content_security_policy": "default-src *; connect-src *; script-src 'self' 'unsafe-eval'",
-  "applications": {
+  "browser_specific_settings": {
     "gecko": {
-      "id": "crx-proxy-manager@warren-bank.github.io",
-      "strict_min_version": "58.0"
+      "id": "moz-proxy-manager@warren-bank.github.io",
+      "strict_min_version": "91.1.0",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
     }
   },
-  "homepage_url": "https://github.com/warren-bank/crx-proxy-manager"
+  "homepage_url": "https://github.com/warren-bank/moz-proxy-manager"
 }

@@ -1,0 +1,32 @@
+https://blog.mozilla.org/addons/2025/10/23/data-collection-consent-changes-for-new-firefox-extensions/
+https://extensionworkshop.com/documentation/develop/firefox-builtin-data-consent/
+
+manifest entry:
+===============
+  "browser_specific_settings": {
+    "gecko": {
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
+  },
+
+"data_collection_permissions" key:
+==================================
+  * required by AMO for new addons
+  * NOT required by AMO for version updates to existing addons
+  * supported by Firefox 140+
+  * NOT supported by older versions of Firefox
+    - installation of addon fails
+    - "about:addons" notification:
+        This add-on could not be installed because it appears to be corrupt.
+    - "Browser Console" log:
+        ERROR	Loading extension 'moz-proxy-manager@warren-bank.github.io': Reading manifest
+        Error processing browser_specific_settings.gecko: Unexpected property "data_collection_permissions"
+
+status:
+=======
+  * v2.0.1 includes this manifest entry
+    - initial release on AMO
+  * v2.1.0 removes this manifest entry
+    - submission for version update to AMO was accepted
